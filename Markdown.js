@@ -69,12 +69,11 @@ var styles = {
     fontWeight: 'bold'
   },
   paragraph: {
-    marginTop: 10,
+    marginTop: 170,
     marginBottom: 10,
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start'
+  },
+  'paragraph--first': {
+    marginTop: 0,
   },
   strong: {
     fontWeight: 'bold'
@@ -124,8 +123,8 @@ var Markdown = React.createClass({
     };
   },
 
-  componentWillMount: function() {
-    var mergedStyles = _.merge({}, styles, this.props.style);
+  _generateParsers(props) {
+    var mergedStyles = _.merge({}, styles, props.style);
     var rules = require('./rules')(mergedStyles);
     rules = _.merge({}, SimpleMarkdown.defaultRules, rules);
 
@@ -135,6 +134,14 @@ var Markdown = React.createClass({
       return parser(blockSource, {inline: false});
     };
     this.renderer = SimpleMarkdown.reactFor(SimpleMarkdown.ruleOutput(rules, 'react'));
+  },
+
+  componentWillMount: function() {
+    this._generateParsers(this.props);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this._generateParsers(nextProps);
   },
 
   render: function() {

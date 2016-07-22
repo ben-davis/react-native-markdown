@@ -10,7 +10,7 @@ import _ from 'lodash';
 module.exports = function(styles) {
   return {
     autolink: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -20,7 +20,7 @@ module.exports = function(styles) {
       }
     },
     blockQuote: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -29,7 +29,7 @@ module.exports = function(styles) {
       }
     },
     br: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         return React.createElement(Text, {
           key: state.key,
           style: styles.br
@@ -37,7 +37,7 @@ module.exports = function(styles) {
       }
     },
     codeBlock: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -46,7 +46,7 @@ module.exports = function(styles) {
       }
     },
     del: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -55,7 +55,7 @@ module.exports = function(styles) {
       }
     },
     em: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -64,7 +64,7 @@ module.exports = function(styles) {
       }
     },
     heading: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -73,12 +73,12 @@ module.exports = function(styles) {
       }
     },
     hr: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         return React.createElement(View, { key: state.key, style: styles.hr });
       }
     },
     image: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         return React.createElement(Image, {
           key: state.key,
           source: { uri: node.target },
@@ -87,7 +87,7 @@ module.exports = function(styles) {
       }
     },
     inlineCode: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -96,7 +96,7 @@ module.exports = function(styles) {
       }
     },
     link: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -105,7 +105,7 @@ module.exports = function(styles) {
       }
     },
     list: {
-      react: function(node, output, state) {
+      react(node, output, state) {
 
         var items = _.map(node.items, function(item, i) {
           var bullet;
@@ -125,7 +125,7 @@ module.exports = function(styles) {
       }
     },
     mailto: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -135,7 +135,7 @@ module.exports = function(styles) {
       }
     },
     newline: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         return React.createElement(Text, {
           key: state.key,
           style: styles.newline
@@ -143,15 +143,15 @@ module.exports = function(styles) {
       }
     },
     paragraph: {
-      react: function(node, output, state) {
-        return React.createElement(View, {
+      react(node, output, state) {
+        return React.createElement(Text, {
           key: state.key,
-          style: styles.paragraph
+          style: [styles.paragraph, styles[`paragraph${state.key === 0 ? '--first' : ''}`]],
         }, output(node.content, state));
       }
     },
     strong: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
@@ -160,7 +160,7 @@ module.exports = function(styles) {
       }
     },
     table: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         var headers = _.map(node.header, function(content, i) {
           return React.createElement(Text, {
             style: styles.tableHeaderCell
@@ -187,27 +187,20 @@ module.exports = function(styles) {
       }
     },
     text: {
-      react: function(node, output, state) {
-        // Breaking words up in order to allow for text reflowing in flexbox
-        var words = node.content.split(' ');
-        words = _.map(words, function(word, i) {
-          var elements = [];
-          if (i != words.length - 1) {
-            word = word + ' ';
-          }
-          var textStyles = [styles.text];
-          if (!state.withinText) {
-            textStyles.push(styles.plainText);
-          }
-          return React.createElement(Text, {
-            style: textStyles
-          }, word);
-        });
-        return words;
-      }
+      react(node, output, state) {
+        var textStyles = [styles.text];
+        if (!state.withinText) {
+          textStyles.push(styles.plainText);
+        }
+
+        return React.createElement(Text, {
+          key: state.key,
+          style: textStyles,
+        }, node.content);
+      },
     },
     u: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(View, {
           key: state.key,
@@ -216,7 +209,7 @@ module.exports = function(styles) {
       }
     },
     url: {
-      react: function(node, output, state) {
+      react(node, output, state) {
         state.withinText = true;
         return React.createElement(Text, {
           key: state.key,
